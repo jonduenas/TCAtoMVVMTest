@@ -14,37 +14,34 @@ struct RootFeature {
     @ObservableState
     struct State: Equatable {
         var path = StackState<Path.State>()
-        var contentFeature = ContentFeature.State()
     }
 
     enum Action {
         case path(StackAction<Path.State, Path.Action>)
-        case contentFeature(ContentFeature.Action)
+        case pushContentViewButtonTapped
         case didSelectCount(Int)
     }
 
     @Reducer(state: .equatable)
     enum Path {
+        case contentFeature(ContentFeature)
         @ReducerCaseIgnored
         case mvvmFeature
     }
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.contentFeature, action: \.contentFeature) {
-            ContentFeature()
-        }
-
         Reduce { state, action in
             switch action {
-            case .path:
-                return .none
-            case .contentFeature(.delegate(.didTapMVVMFeature)):
+            case .path(.element(id: _, action: .contentFeature(.delegate(.didTapMVVMFeature)))):
                 state.path.append(.mvvmFeature)
                 return .none
-            case .contentFeature:
+            case .path:
                 return .none
             case let .didSelectCount(count):
                 // If Root should receive count, then how to send back to ContentFeature?
+                return .none
+            case .pushContentViewButtonTapped:
+                state.path.append(.contentFeature(ContentFeature.State()))
                 return .none
             }
         }
@@ -102,9 +99,13 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            ContentView(store: store.scope(state: \.contentFeature, action: \.contentFeature))
+            Button("Push ContentView") {
+                store.send(.pushContentViewButtonTapped)
+            }
         } destination: { store in
             switch store.case {
+            case let .contentFeature(contentStore):
+                ContentView(store: contentStore)
             case .mvvmFeature:
                 let vm = ViewModel()
                 let _ = vm.onButtonTapped = { [weak store = self.store] count in
