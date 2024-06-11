@@ -10,57 +10,78 @@ import ComposableArchitecture
 import SwiftUINavigation
 
 @Reducer
-struct ContentFeature {
+struct RootFeature {
     @ObservableState
-    public struct State: Equatable {
+    struct State: Equatable {
         var path = StackState<Path.State>()
-        var count = 0
+        var contentFeature = ContentFeature.State()
     }
 
-    public enum Action{
+    enum Action {
         case path(StackAction<Path.State, Path.Action>)
-        case buttonTapped
-        case pushMVVMFeature(ViewModel)
+        case contentFeature(ContentFeature.Action)
         case didSelectCount(Int)
     }
 
     @Reducer(state: .equatable)
-    public enum Path {
+    enum Path {
         @ReducerCaseIgnored
-        case mvvmFeature(ViewModel)
+        case mvvmFeature
+    }
+
+    var body: some ReducerOf<Self> {
+        Scope(state: \.contentFeature, action: \.contentFeature) {
+            ContentFeature()
+        }
+
+        Reduce { state, action in
+            switch action {
+            case .path:
+                return .none
+            case .contentFeature(.delegate(.didTapMVVMFeature)):
+                state.path.append(.mvvmFeature)
+                return .none
+            case .contentFeature:
+                return .none
+            case let .didSelectCount(count):
+                // If Root should receive count, then how to send back to ContentFeature?
+                return .none
+            }
+        }
+        .forEach(\.path, action: \.path)
+    }
+}
+
+@Reducer
+struct ContentFeature {
+    @ObservableState
+    struct State: Equatable {
+        var count = 0
+    }
+
+    enum Action {
+        @CasePathable
+        enum Delegate {
+            case didTapMVVMFeature
+        }
+
+        case buttonTapped
+        case didSelectCount(Int)
+        case delegate(Delegate)
     }
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .path:
-                return .none
             case .buttonTapped:
-                return .run { @MainActor send in
-                    let viewModel = ViewModel()
-                    let (stream, continuation) = AsyncStream.makeStream(of: Int.self)
-
-                    viewModel.onButtonTapped = { count in
-                        continuation.yield(count)
-                    }
-
-                    send(.pushMVVMFeature(viewModel))
-
-                    for await count in stream {
-                        send(.didSelectCount(count))
-                    }
-                    print("Stream cancelled")
-                }
-            case .pushMVVMFeature(let viewModel):
-                state.path.append(.mvvmFeature(viewModel))
-                return .none
+                return .send(.delegate(.didTapMVVMFeature))
             case .didSelectCount(let count):
                 state.count = count
-                state.path.removeLast()
+                return .none
+            case .delegate:
                 return .none
             }
         }
-        .forEach(\.path, action: \.path)
     }
 }
 
@@ -76,28 +97,41 @@ final class ViewModel: HashableObject {
     }
 }
 
-struct ContentView: View {
-    @Bindable var store: StoreOf<ContentFeature>
+struct RootView: View {
+    @Bindable var store: StoreOf<RootFeature>
 
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            VStack {
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("Hello, world!")
-                Text("Store Count: \(store.count)")
-                Button("Push MVVM Feature") {
-                    store.send(.buttonTapped)
-                }
-            }
-            .padding()
+            ContentView(store: store.scope(state: \.contentFeature, action: \.contentFeature))
         } destination: { store in
             switch store.case {
-            case .mvvmFeature(let viewModel):
-                MVVMFeatureView(viewModel: viewModel)
+            case .mvvmFeature:
+                let vm = ViewModel()
+                let _ = vm.onButtonTapped = { [weak store = self.store] count in
+                    // Send to RootFeature Store? How to get back into ContentFeature?
+                    store?.send(.didSelectCount(count))
+                }
+                MVVMFeatureView(viewModel: vm)
             }
         }
+    }
+}
+
+struct ContentView: View {
+    let store: StoreOf<ContentFeature>
+
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+            Text("Store Count: \(store.count)")
+            Button("Push MVVM Feature") {
+                store.send(.buttonTapped)
+            }
+        }
+        .padding()
     }
 }
 

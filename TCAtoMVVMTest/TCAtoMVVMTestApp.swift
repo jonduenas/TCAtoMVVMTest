@@ -12,7 +12,7 @@ import ComposableArchitecture
 struct TCAtoMVVMTestApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(store: Store(initialState: ContentFeature.State(), reducer: ContentFeature.init))
+            RootView(store: Store(initialState: RootFeature.State(), reducer: RootFeature.init))
         }
     }
 }
