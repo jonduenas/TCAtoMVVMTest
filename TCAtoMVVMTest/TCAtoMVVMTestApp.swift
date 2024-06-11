@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct TCAtoMVVMTestApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(store: Store(initialState: ContentFeature.State(), reducer: ContentFeature.init))
         }
     }
 }

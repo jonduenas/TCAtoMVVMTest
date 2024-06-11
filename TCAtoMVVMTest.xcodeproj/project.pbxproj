@@ -11,6 +11,9 @@
 		65C80BA72C189E5D0049741C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C80BA62C189E5D0049741C /* ContentView.swift */; };
 		65C80BA92C189E5F0049741C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65C80BA82C189E5F0049741C /* Assets.xcassets */; };
 		65C80BAC2C189E5F0049741C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65C80BAB2C189E5F0049741C /* Preview Assets.xcassets */; };
+		65C80BB42C189E8B0049741C /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 65C80BB32C189E8B0049741C /* ComposableArchitecture */; };
+		65C80BB72C18A4BE0049741C /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = 65C80BB62C18A4BE0049741C /* SwiftUINavigation */; };
+		65C80BB92C18A4BE0049741C /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 65C80BB82C18A4BE0049741C /* SwiftUINavigationCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +29,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65C80BB72C18A4BE0049741C /* SwiftUINavigation in Frameworks */,
+				65C80BB92C18A4BE0049741C /* SwiftUINavigationCore in Frameworks */,
+				65C80BB42C189E8B0049741C /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +89,11 @@
 			dependencies = (
 			);
 			name = TCAtoMVVMTest;
+			packageProductDependencies = (
+				65C80BB32C189E8B0049741C /* ComposableArchitecture */,
+				65C80BB62C18A4BE0049741C /* SwiftUINavigation */,
+				65C80BB82C18A4BE0049741C /* SwiftUINavigationCore */,
+			);
 			productName = TCAtoMVVMTest;
 			productReference = 65C80BA12C189E5D0049741C /* TCAtoMVVMTest.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +122,10 @@
 				Base,
 			);
 			mainGroup = 65C80B982C189E5D0049741C;
+			packageReferences = (
+				65C80BB22C189E8B0049741C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				65C80BB52C18A4BE0049741C /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
+			);
 			productRefGroup = 65C80BA22C189E5D0049741C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -344,6 +359,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		65C80BB22C189E8B0049741C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.11.0;
+			};
+		};
+		65C80BB52C18A4BE0049741C /* XCRemoteSwiftPackageReference "swiftui-navigation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swiftui-navigation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		65C80BB32C189E8B0049741C /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65C80BB22C189E8B0049741C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+		65C80BB62C18A4BE0049741C /* SwiftUINavigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65C80BB52C18A4BE0049741C /* XCRemoteSwiftPackageReference "swiftui-navigation" */;
+			productName = SwiftUINavigation;
+		};
+		65C80BB82C18A4BE0049741C /* SwiftUINavigationCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65C80BB52C18A4BE0049741C /* XCRemoteSwiftPackageReference "swiftui-navigation" */;
+			productName = SwiftUINavigationCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 65C80B992C189E5D0049741C /* Project object */;
 }
